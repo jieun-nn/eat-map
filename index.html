@@ -1330,7 +1330,7 @@ function renderCard(r) {
         <div class="card__tags">${tagsHtml}</div>
         <div class="card__actions">
           <button class="btn btn--brand-solid btn--small" style="flex:1" onclick="event.stopPropagation(); openModal(${r.id})">자세히 보기</button>
-          <button class="btn btn--neutral-weak btn--small" onclick="event.stopPropagation()">길 찾기</button>
+          <a class="btn btn--neutral-weak btn--small" href="https://map.naver.com/v5/search/${encodeURIComponent(r.address)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">길 찾기</a>
         </div>
       </div>
     </article>`;
