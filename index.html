@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>맛집지도 — 서울·경기도 맛집 & 평점</title>
+  <style>
+    /* ── Seed Design System Tokens ── */
+    :root {
+      /* Brand (Carrot) */
+      --color-bg-brand-solid: #FF6F0F;
+      --color-bg-brand-solid-pressed: #E55C00;
+      --color-fg-brand: #FF6F0F;
+      --color-stroke-brand: #FF6F0F;
+
+      /* Neutral */
+      --color-bg-neutral-inverted: #212124;
+      --color-bg-neutral-inverted-pressed: #3A3A3D;
+      --color-bg-neutral-weak: #F2F3F6;
+      --color-bg-neutral-weak-pressed: #E8E9ED;
+      --color-fg-neutral: #3A3A3D;
+      --color-fg-neutral-inverted: #FFFFFF;
+      --color-fg-neutral-muted: #868B94;
+      --color-stroke-neutral-muted: #D9DADE;
+
+      /* Critical */
+      --color-bg-critical-solid: #E84040;
+      --color-bg-critical-solid-pressed: #C73333;
+
+      /* Static */
+      --color-static-white: #FFFFFF;
+      --color-static-white-alpha-300: rgba(255,255,255,0.3);
+      --color-bg-transparent: transparent;
+      --color-bg-transparent-pressed: rgba(0,0,0,0.05);
+      --color-bg-disabled: #EAEBEE;
+      --color-fg-disabled: #BEC1C8;
+
+      /* Palette */
+      --color-carrot-200: #FFC89A;
+      --color-gray-100: #F7F8F9;
+      --color-gray-200: #EAEBEE;
+      --color-gray-500: #868B94;
+
+      /* Surface / Background */
+      --color-surface: #FFFFFF;
+      --color-surface-sub: #F7F8F9;
+
+      /* Radius */
+      --radius-full: 9999px;
+      --radius-r2: 8px;
+      --radius-r3: 12px;
+      --radius-card: 16px;
+
+      /* Dimension scale (base = 4px) */
+      --dim-x1: 4px;
+      --dim-x1_5: 6px;
+      --dim-x2: 8px;
+      --dim-x2_5: 10px;
+      --dim-x3: 12px;
+      --dim-x3_5: 14px;
+      --dim-x4: 16px;
+      --dim-x5: 20px;
+      --dim-x8: 32px;
+      --dim-x9: 36px;
+      --dim-x10: 40px;
+      --dim-x13: 52px;
+
+      /* Font */
+      --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      --font-weight-bold: 700;
+      --font-weight-semibold: 600;
+      --font-weight-regular: 400;
+    }
+
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-family);
+      background: var(--color-surface-sub);
+      color: var(--color-fg-neutral);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+    button { font-family: inherit; cursor: pointer; border: none; outline: none; }
+
+    /* ── Action Button Component ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--dim-x1_5);
+      font-weight: var(--font-weight-bold);
+      border-radius: var(--radius-r2);
+      transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+      white-space: nowrap;
+      border: none;
+      cursor: pointer;
+    }
+    /* Size: xsmall */
+    .btn--xsmall {
+      min-height: var(--dim-x8);
+      padding: var(--dim-x1_5) var(--dim-x3_5);
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      line-height: 1.4;
+      gap: var(--dim-x1);
+    }
+    /* Size: small */
+    .btn--small {
+      min-height: var(--dim-x9);
+      padding: var(--dim-x2) var(--dim-x3_5);
+      border-radius: var(--radius-r2);
+      font-size: 14px;
+      line-height: 1.4;
+      gap: var(--dim-x1);
+    }
+    /* Size: medium */
+    .btn--medium {
+      min-height: var(--dim-x10);
+      padding: var(--dim-x2_5) var(--dim-x4);
+      border-radius: var(--radius-r2);
+      font-size: 14px;
+      line-height: 1.4;
+      gap: var(--dim-x1_5);
+    }
+    /* Size: large */
+    .btn--large {
+      min-height: var(--dim-x13);
+      padding: var(--dim-x3_5) var(--dim-x5);
+      border-radius: var(--radius-r3);
+      font-size: 18px;
+      line-height: 1.4;
+      gap: var(--dim-x2);
+    }
+    /* Variant: brandSolid */
+    .btn--brand-solid {
+      background: var(--color-bg-brand-solid);
+      color: var(--color-static-white);
+    }
+    .btn--brand-solid:hover { background: var(--color-bg-brand-solid-pressed); }
+    .btn--brand-solid:active { background: var(--color-bg-brand-solid-pressed); }
+    /* Variant: neutralSolid */
+    .btn--neutral-solid {
+      background: var(--color-bg-neutral-inverted);
+      color: var(--color-fg-neutral-inverted);
+    }
+    .btn--neutral-solid:hover { background: var(--color-bg-neutral-inverted-pressed); }
+    /* Variant: neutralWeak */
+    .btn--neutral-weak {
+      background: var(--color-bg-neutral-weak);
+      color: var(--color-fg-neutral);
+    }
+    .btn--neutral-weak:hover { background: var(--color-bg-neutral-weak-pressed); }
+    /* Variant: neutralOutline */
+    .btn--neutral-outline {
+      background: transparent;
+      color: var(--color-fg-neutral);
+      border: 1px solid var(--color-stroke-neutral-muted);
+    }
+    .btn--neutral-outline:hover { background: var(--color-bg-transparent-pressed); }
+    /* Variant: brandOutline */
+    .btn--brand-outline {
+      background: transparent;
+      color: var(--color-fg-brand);
+      border: 1px solid var(--color-stroke-neutral-muted);
+    }
+    .btn--brand-outline:hover { background: rgba(255,111,15,0.05); }
+    /* Variant: ghost */
+    .btn--ghost {
+      background: transparent;
+      color: var(--color-fg-neutral);
+    }
+    .btn--ghost:hover { background: var(--color-bg-transparent-pressed); }
+    /* Width: fill */
+    .btn--fill { width: 100%; }
+
+    /* ── Chip Component (filter) ── */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: var(--font-weight-semibold);
+      border: 1.5px solid var(--color-stroke-neutral-muted);
+      background: var(--color-static-white);
+      color: var(--color-fg-neutral-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .chip:hover { border-color: var(--color-bg-brand-solid); color: var(--color-fg-brand); }
+    .chip--active {
+      border-color: var(--color-bg-brand-solid);
+      background: rgba(255,111,15,0.07);
+      color: var(--color-fg-brand);
+      font-weight: var(--font-weight-bold);
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ── Header / GNB ── */
+    .gnb {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--color-static-white);
+      border-bottom: 1px solid var(--color-gray-200);
+      backdrop-filter: blur(8px);
+    }
+    .gnb__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      gap: 16px;
+    }
+    .gnb__logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 20px;
+      font-weight: var(--font-weight-bold);
+      color: var(--color-bg-brand-solid);
+    }
+    .gnb__logo-icon { font-size: 26px; }
+    .gnb__search {
+      flex: 1;
+      max-width: 420px;
+      position: relative;
+    }
+    .gnb__search input {
+      width: 100%;
+      height: 40px;
+      border-radius: var(--radius-full);
+      border: 1.5px solid var(--color-stroke-neutral-muted);
+      padding: 0 16px 0 42px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--color-gray-100);
+      color: var(--color-fg-neutral);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .gnb__search input:focus {
+      border-color: var(--color-bg-brand-solid);
+      background: var(--color-static-white);
+    }
+    .gnb__search input::placeholder { color: var(--color-fg-neutral-muted); }
+    .gnb__search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-gray-500);
+      font-size: 16px;
+      pointer-events: none;
+    }
+    .gnb__actions { display: flex; gap: 8px; align-items: center; }
+
+    /* ── Hero Banner ── */
+    .hero {
+      background: linear-gradient(135deg, #FF6F0F 0%, #FF9A5C 50%, #FFB87A 100%);
+      color: white;
+      padding: 56px 20px 48px;
+      text-align: center;
+    }
+    .hero__eyebrow {
+      font-size: 13px;
+      font-weight: var(--font-weight-semibold);
+      letter-spacing: 0.06em;
+      opacity: 0.85;
+      margin-bottom: 12px;
+    }
+    .hero__title {
+      font-size: clamp(28px, 5vw, 46px);
+      font-weight: var(--font-weight-bold);
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+    .hero__subtitle {
+      font-size: 16px;
+      opacity: 0.9;
+      margin-bottom: 32px;
+    }
+    .hero__stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .hero__stat { text-align: center; }
+    .hero__stat-value {
+      font-size: 28px;
+      font-weight: var(--font-weight-bold);
+      display: block;
+    }
+    .hero__stat-label { font-size: 13px; opacity: 0.8; margin-top: 2px; }
+
+    /* ── Filter Bar ── */
+    .filter-bar {
+      background: var(--color-static-white);
+      border-bottom: 1px solid var(--color-gray-200);
+      padding: 16px 0;
+      position: sticky;
+      top: 60px;
+      z-index: 90;
+    }
+    .filter-bar__section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-bar__label {
+      font-size: 13px;
+      font-weight: var(--font-weight-bold);
+      color: var(--color-fg-neutral-muted);
+      min-width: 36px;
+    }
+    .filter-bar__chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .filter-divider {
+      height: 1px;
+      background: var(--color-gray-200);
+      margin: 10px 0;
+    }
+
+    /* ── Sort Bar ── */
+    .sort-bar {
+      padding: 20px 0 12px;
+    }
+    .sort-bar__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .sort-bar__count {
+      font-size: 14px;
+      color: var(--color-fg-neutral-muted);
+    }
+    .sort-bar__count strong {
+      color: var(--color-fg-neutral);
+      font-weight: var(--font-weight-bold);
+    }
+    .sort-bar__right { display: flex; gap: 6px; }
+
+    /* ── Restaurant Grid ── */
+    .restaurant-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      padding-bottom: 48px;
+    }
+
+    /* ── Restaurant Card ── */
+    .card {
+      background: var(--color-static-white);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1), 0 16px 40px rgba(0,0,0,0.08);
+    }
+    .card__thumb {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: var(--color-gray-200);
+      overflow: hidden;
+    }
+    .card__thumb-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.35s ease;
+      display: block;
+    }
+    .card:hover .card__thumb-img { transform: scale(1.06); }
+    .card__thumb-fallback {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 52px;
+      background: var(--color-gray-100);
+    }
+    /* skeleton shimmer while loading */
+    .card__thumb::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, var(--color-gray-200) 25%, var(--color-gray-100) 50%, var(--color-gray-200) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      z-index: 0;
+    }
+    .card__thumb-img.loaded ~ .card__thumb::before,
+    .card__thumb-img:not([src]) { display: none; }
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .card__badge-area {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      display: flex;
+      gap: 4px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: var(--font-weight-bold);
+      letter-spacing: 0.02em;
+    }
+    .badge--brand {
+      background: var(--color-bg-brand-solid);
+      color: var(--color-static-white);
+    }
+    .badge--dark {
+      background: rgba(33,33,36,0.75);
+      color: var(--color-static-white);
+      backdrop-filter: blur(4px);
+    }
+    .badge--new {
+      background: #34C759;
+      color: white;
+    }
+    .card__bookmark {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.15s;
+      border: none;
+    }
+    .card__bookmark:hover { transform: scale(1.1); }
+    .card__body { padding: 14px 16px 16px; }
+    .card__category {
+      font-size: 11px;
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-fg-brand);
+      margin-bottom: 4px;
+      letter-spacing: 0.04em;
+    }
+    .card__name {
+      font-size: 16px;
+      font-weight: var(--font-weight-bold);
+      margin-bottom: 4px;
+      color: var(--color-fg-neutral);
+    }
+    .card__location {
+      font-size: 12px;
+      color: var(--color-fg-neutral-muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .card__rating-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .rating {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .rating__stars { display: flex; gap: 1px; }
+    .star { font-size: 14px; line-height: 1; }
+    .star--full { color: #FF9500; }
+    .star--half { color: #FF9500; opacity: 0.6; }
+    .star--empty { color: #D9DADE; }
+    .rating__score {
+      font-size: 15px;
+      font-weight: var(--font-weight-bold);
+      color: var(--color-fg-neutral);
+    }
+    .rating__count {
+      font-size: 12px;
+      color: var(--color-fg-neutral-muted);
+    }
+    .card__price-range {
+      font-size: 13px;
+      color: var(--color-fg-neutral-muted);
+    }
+    .card__tags {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      background: var(--color-gray-100);
+      color: var(--color-fg-neutral-muted);
+    }
+    .card__actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* ── Empty State ── */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--color-fg-neutral-muted);
+    }
+    .empty-state__icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-state__title {
+      font-size: 18px;
+      font-weight: var(--font-weight-bold);
+      margin-bottom: 8px;
+      color: var(--color-fg-neutral);
+    }
+    .empty-state__desc { font-size: 14px; margin-bottom: 24px; }
+
+    /* ── Modal (Restaurant Detail) ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .modal-overlay--open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal {
+      background: var(--color-static-white);
+      border-radius: 20px;
+      max-width: 560px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: translateY(16px);
+      transition: transform 0.25s;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+    }
+    .modal-overlay--open .modal { transform: translateY(0); }
+    .modal__hero {
+      aspect-ratio: 16/7;
+      background: var(--color-gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 72px;
+      border-radius: 20px 20px 0 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .modal__hero-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .modal__close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.9);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal__body { padding: 24px; }
+    .modal__category {
+      font-size: 12px;
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-fg-brand);
+      margin-bottom: 6px;
+    }
+    .modal__name {
+      font-size: 22px;
+      font-weight: var(--font-weight-bold);
+      margin-bottom: 6px;
+    }
+    .modal__location {
+      font-size: 14px;
+      color: var(--color-fg-neutral-muted);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .modal__rating-block {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--color-gray-100);
+      border-radius: var(--radius-r3);
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .modal__rating-score {
+      font-size: 40px;
+      font-weight: var(--font-weight-bold);
+      color: var(--color-fg-neutral);
+      line-height: 1;
+    }
+    .modal__rating-detail { flex: 1; }
+    .modal__rating-stars { margin-bottom: 4px; }
+    .modal__rating-count { font-size: 13px; color: var(--color-fg-neutral-muted); }
+    .modal__info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .modal__info-item {
+      background: var(--color-gray-100);
+      border-radius: var(--radius-r2);
+      padding: 12px;
+    }
+    .modal__info-key {
+      font-size: 11px;
+      color: var(--color-fg-neutral-muted);
+      margin-bottom: 4px;
+      font-weight: var(--font-weight-semibold);
+    }
+    .modal__info-val {
+      font-size: 14px;
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-fg-neutral);
+    }
+    .modal__desc {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--color-fg-neutral);
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--color-gray-200);
+    }
+    .modal__review-title {
+      font-size: 16px;
+      font-weight: var(--font-weight-bold);
+      margin-bottom: 12px;
+    }
+    .review-item {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--color-gray-200);
+    }
+    .review-item:last-child { border-bottom: none; }
+    .review-item__header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .review-item__avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--color-carrot-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .review-item__name {
+      font-size: 13px;
+      font-weight: var(--font-weight-semibold);
+    }
+    .review-item__date {
+      font-size: 12px;
+      color: var(--color-fg-neutral-muted);
+      margin-left: auto;
+    }
+    .review-item__stars { font-size: 12px; margin-bottom: 4px; }
+    .review-item__text { font-size: 13px; line-height: 1.6; color: var(--color-fg-neutral); }
+    .modal__cta { margin-top: 20px; display: flex; gap: 8px; }
+
+    /* ── Footer ── */
+    .footer {
+      background: var(--color-bg-neutral-inverted);
+      color: var(--color-fg-neutral-inverted);
+      padding: 40px 20px;
+      margin-top: 48px;
+    }
+    .footer__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .footer__brand { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: var(--font-weight-bold); color: var(--color-bg-brand-solid); }
+    .footer__copy { font-size: 13px; opacity: 0.5; margin-top: 8px; }
+    .footer__links { display: flex; gap: 20px; font-size: 13px; opacity: 0.6; }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .gnb__actions .btn--medium { display: none; }
+      .hero { padding: 36px 16px 32px; }
+      .hero__stats { gap: 24px; }
+      .restaurant-grid { grid-template-columns: 1fr; }
+      .modal__info-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card { animation: fadeInUp 0.3s ease both; }
+    .card:nth-child(2) { animation-delay: 0.04s; }
+    .card:nth-child(3) { animation-delay: 0.08s; }
+    .card:nth-child(4) { animation-delay: 0.12s; }
+    .card:nth-child(5) { animation-delay: 0.16s; }
+    .card:nth-child(6) { animation-delay: 0.20s; }
+  </style>
+</head>
+<body>
+
+<!-- ── GNB ── -->
+<nav class="gnb">
+  <div class="container gnb__inner">
+    <a href="#" class="gnb__logo">
+      <span class="gnb__logo-icon">🍊</span>
+      맛집지도
+    </a>
+    <div class="gnb__search">
+      <span class="gnb__search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="식당 이름, 지역, 음식 종류 검색..." />
+    </div>
+    <div class="gnb__actions">
+      <button class="btn btn--neutral-weak btn--medium" id="randomBtn">🎲 랜덤 추천</button>
+      <button class="btn btn--brand-solid btn--medium">📝 리뷰 쓰기</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <p class="hero__eyebrow">🗺 서울 · 경기도</p>
+  <h1 class="hero__title">진짜 맛있는 맛집만<br>골라드려요</h1>
+  <p class="hero__subtitle">실제 방문자 리뷰로 만든 믿을 수 있는 맛집 정보</p>
+  <div class="hero__stats">
+    <div class="hero__stat">
+      <span class="hero__stat-value" id="totalCount">24</span>
+      <div class="hero__stat-label">등록 식당</div>
+    </div>
+    <div class="hero__stat">
+      <span class="hero__stat-value">1,240+</span>
+      <div class="hero__stat-label">리뷰 수</div>
+    </div>
+    <div class="hero__stat">
+      <span class="hero__stat-value">4.3★</span>
+      <div class="hero__stat-label">평균 평점</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Filter Bar ── -->
+<div class="filter-bar">
+  <div class="container">
+    <div class="filter-bar__section">
+      <span class="filter-bar__label">지역</span>
+      <div class="filter-bar__chips" id="regionChips">
+        <button class="chip chip--active" data-region="전체">전체</button>
+        <button class="chip" data-region="서울">서울</button>
+        <button class="chip" data-region="강남구">강남구</button>
+        <button class="chip" data-region="마포구">마포구</button>
+        <button class="chip" data-region="종로구">종로구</button>
+        <button class="chip" data-region="용산구">용산구</button>
+        <button class="chip" data-region="성동구">성동구</button>
+        <button class="chip" data-region="경기">경기도</button>
+        <button class="chip" data-region="수원시">수원시</button>
+        <button class="chip" data-region="성남시">성남시</button>
+        <button class="chip" data-region="고양시">고양시</button>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-bar__section">
+      <span class="filter-bar__label">카테고리</span>
+      <div class="filter-bar__chips" id="categoryChips">
+        <button class="chip chip--active" data-cat="전체">전체</button>
+        <button class="chip" data-cat="한식">🍚 한식</button>
+        <button class="chip" data-cat="일식">🍣 일식</button>
+        <button class="chip" data-cat="중식">🥟 중식</button>
+        <button class="chip" data-cat="양식">🍝 양식</button>
+        <button class="chip" data-cat="분식">🍜 분식</button>
+        <button class="chip" data-cat="카페">☕ 카페</button>
+        <button class="chip" data-cat="고기">🥩 고기</button>
+        <button class="chip" data-cat="해산물">🦞 해산물</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Main Content ── -->
+<main>
+  <div class="container">
+    <!-- Sort Bar -->
+    <div class="sort-bar">
+      <div class="sort-bar__inner">
+        <p class="sort-bar__count" id="resultCount">총 <strong>24개</strong>의 식당</p>
+        <div class="sort-bar__right">
+          <button class="btn btn--neutral-outline btn--small sort-btn sort-btn--active" data-sort="rating">⭐ 평점순</button>
+          <button class="btn btn--neutral-outline btn--small sort-btn" data-sort="reviews">💬 리뷰순</button>
+          <button class="btn btn--neutral-outline btn--small sort-btn" data-sort="name">🔤 이름순</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid -->
+    <div class="restaurant-grid" id="restaurantGrid"></div>
+  </div>
+</main>
+
+<!-- ── Modal ── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent">
+    <!-- JS로 채워짐 -->
+  </div>
+</div>
+
+<!-- ── Footer ── -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div>
+      <div class="footer__brand">🍊 맛집지도</div>
+      <p class="footer__copy">© 2026 맛집지도. Powered by Seed Design System.</p>
+    </div>
+    <div class="footer__links">
+      <a href="#">이용약관</a>
+      <a href="#">개인정보처리방침</a>
+      <a href="#">고객센터</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── 식당 사진 맵 (Unsplash) ── */
+const IMAGE_MAP = {
+  1:  "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=700&h=467&fit=crop&q=80", // 맥주·안주
+  2:  "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=700&h=467&fit=crop&q=80", // 한국 국물 요리
+  3:  "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=700&h=467&fit=crop&q=80", // 파스타
+  4:  "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=700&h=467&fit=crop&q=80", // 함박스테이크·버거
+  5:  "https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=700&h=467&fit=crop&q=80", // 스시 오마카세
+  6:  "https://images.unsplash.com/photo-1583835746434-cf1ab2f2cb2a?w=700&h=467&fit=crop&q=80", // 한국 찌개
+  7:  "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=700&h=467&fit=crop&q=80", // 라멘·면 요리
+  8:  "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=700&h=467&fit=crop&q=80", // 매콤한 길거리 음식
+  9:  "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=700&h=467&fit=crop&q=80", // 한정식 상차림
+  10: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=700&h=467&fit=crop&q=80", // 카페·커피
+  11: "https://images.unsplash.com/photo-1590301157890-4d025c19ec51?w=700&h=467&fit=crop&q=80", // 한국식 BBQ
+  12: "https://images.unsplash.com/photo-1559737558-2f5a35f4523b?w=700&h=467&fit=crop&q=80", // 해산물·회
+  13: "https://images.unsplash.com/photo-1544025162-d76538579e86?w=700&h=467&fit=crop&q=80", // 갈비
+  14: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=700&h=467&fit=crop&q=80", // 라멘 2
+  15: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=700&h=467&fit=crop&q=80", // 메밀·냉면
+  16: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=700&h=467&fit=crop&q=80", // 스테이크
+  17: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=700&h=467&fit=crop&q=80", // 라테 아트 커피
+  18: "https://images.unsplash.com/photo-1553621042-f6e147245754?w=700&h=467&fit=crop&q=80", // 스시 니기리
+  19: "https://images.unsplash.com/photo-1547592180-85f173990554?w=700&h=467&fit=crop&q=80", // 따뜻한 국물 요리
+  20: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=700&h=467&fit=crop&q=80", // 매운 탕·찌개
+  21: "https://images.unsplash.com/photo-1565299624224-6ecbc5a01cd3?w=700&h=467&fit=crop&q=80", // 돈까스·튀김
+  22: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=700&h=467&fit=crop&q=80", // 수제버거
+  23: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=700&h=467&fit=crop&q=80", // 갈비 BBQ
+  24: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=700&h=467&fit=crop&q=80", // 부대찌개·찌개
+};
+
+/* ── 식당 데이터 ── */
+const RESTAURANTS = [
+  {
+    id: 1, name: "을지로 노가리골목 안주타",
+    category: "한식", region: "서울", district: "중구",
+    address: "서울 중구 을지로 122",
+    emoji: "🍺", rating: 4.8, reviewCount: 312,
+    price: "₩₩", tags: ["노가리", "을지로", "야장"],
+    hours: "17:00 – 02:00", holiday: "일요일",
+    desc: "을지로 노가리 골목의 대표 선술집. 바삭하게 튀긴 노가리와 시원한 생맥주 조합은 서울 야식 문화의 상징입니다. 오래된 간판과 빛바랜 메뉴판이 오히려 정겨운 분위기를 만들어냅니다.",
+    reviews: [
+      { user: "🧑 김동현", date: "2025-11-20", score: 5, text: "노가리 하나에 생맥 한 잔! 서울 야간 필수 코스입니다." },
+      { user: "👩 이수진", date: "2025-10-14", score: 5, text: "을지로 감성 그 자체. 테이블이 좁아도 분위기가 최고예요." }
+    ],
+    isNew: false, isHot: true
+  },
+  {
+    id: 2, name: "광화문 국밥",
+    category: "한식", region: "서울", district: "종로구",
+    address: "서울 종로구 종로 1가 85",
+    emoji: "🍲", rating: 4.6, reviewCount: 528,
+    price: "₩", tags: ["순대국밥", "해장", "24시간"],
+    hours: "24시간", holiday: "연중무휴",
+    desc: "광화문 직장인들의 든든한 아침 해장국. 진한 사골 육수에 부드러운 순대가 듬뿍 들어있어 속이 든든해집니다. 40년 전통을 이어온 맛.",
+    reviews: [
+      { user: "🧑 박철수", date: "2025-12-01", score: 5, text: "진한 사골국물이 제대로! 해장하러 왔다가 반해버렸어요." },
+      { user: "👩 최민지", date: "2025-11-08", score: 4, text: "새벽에도 문 열어서 너무 좋아요. 국물이 진합니다." }
+    ],
+    isNew: false, isHot: true
+  },
+  {
+    id: 3, name: "합정동 파스타하우스",
+    category: "양식", region: "서울", district: "마포구",
+    address: "서울 마포구 합정동 388-2",
+    emoji: "🍝", rating: 4.5, reviewCount: 187,
+    price: "₩₩₩", tags: ["파스타", "와인", "데이트"],
+    hours: "11:30 – 22:00", holiday: "월요일",
+    desc: "합정동 골목 안에 숨어있는 분위기 좋은 이탈리안 레스토랑. 매일 아침 직접 반죽하는 생면 파스타와 합리적인 와인 리스트로 인기. 넓은 창문 너머 골목 뷰가 낭만적입니다.",
+    reviews: [
+      { user: "👩 강혜린", date: "2025-12-10", score: 5, text: "생면 파스타 식감이 정말 특별해요. 데이트 코스로 강추!" },
+      { user: "🧑 유재석", date: "2025-11-25", score: 4, text: "분위기 너무 좋고 와인 페어링이 훌륭해요." }
+    ],
+    isNew: false, isHot: false
+  },
+  {
+    id: 4, name: "이태원 함바그",
+    category: "양식", region: "서울", district: "용산구",
+    address: "서울 용산구 이태원로 161",
+    emoji: "🍔", rating: 4.7, reviewCount: 440,
+    price: "₩₩", tags: ["함박스테이크", "런치", "용산"],
+    hours: "11:00 – 21:00", holiday: "화요일",
+    desc: "이태원에서 일본식 함박스테이크를 전문으로 하는 곳. 두툼하고 육즙이 풍부한 함박에 데미글라스 소스를 듬뿍 뿌려 제공합니다. 런치 세트 가성비가 탁월합니다.",
+    reviews: [
+      { user: "🧑 정우성", date: "2025-12-05", score: 5, text: "함박이 정말 두툼하고 육즙이 살아있어요. 런치 완벽!" },
+      { user: "👩 손예진", date: "2025-11-18", score: 5, text: "데미글라스 소스가 끝내줘요. 이태원 최고 맛집입니다." }
+    ],
+    isNew: true, isHot: true
+  },
+  {
+    id: 5, name: "강남 오마카세 스시야",
+    category: "일식", region: "서울", district: "강남구",
+    address: "서울 강남구 청담동 77-1",
+    emoji: "🍣", rating: 4.9, reviewCount: 92,
+    price: "₩₩₩₩", tags: ["오마카세", "스시", "청담"],
+    hours: "12:00 – 22:00", holiday: "일·월요일",
+    desc: "청담동의 숨겨진 명소. 일본 현지 경력 10년의 주방장이 당일 입고된 최상급 제철 어패류로 정성스럽게 쥐어주는 스시 오마카세. 예약은 3개월 전.",
+    reviews: [
+      { user: "👩 김태희", date: "2025-12-08", score: 5, text: "이 가격에 이 퀄리티라니... 서울 스시 원탑이에요." },
+      { user: "🧑 류준열", date: "2025-10-30", score: 5, text: "주방장님이 설명해주시면서 제공해주셔서 더 특별했습니다." }
+    ],
+    isNew: false, isHot: true
+  },
+  {
+    id: 6, name: "성수동 뚝섬 감자탕",
+    category: "한식", region: "서울", district: "성동구",
+    address: "서울 성동구 성수이로 77",
+    emoji: "🥘", rating: 4.4, reviewCount: 256,
+    price: "₩₩", tags: ["감자탕", "뼈다귀", "성수"],
+    hours: "10:00 – 23:00", holiday: "없음",
+    desc: "성수동 힙스터 거리 속 30년 전통 감자탕집. 진한 뼈 육수에 우거지와 감자가 푹 익어 깊은 맛을 냅니다. 성수의 새것과 옛것이 공존하는 명소.",
+    reviews: [
+      { user: "🧑 박서준", date: "2025-11-28", score: 4, text: "국물이 깊고 진해요. 성수 나들이 끝나고 꼭 들르는 곳." },
+      { user: "👩 아이유", date: "2025-10-22", score: 5, text: "30년 전통의 맛! 뼈 살이 술술 발라집니다." }
+    ],
+    isNew: false, isHot: false
+  },
+  {
+    id: 7, name: "홍대 탄탄면 전문점",
+    category: "중식", region: "서울", district: "마포구",
+    address: "서울 마포구 와우산로 21길 13",
+    emoji: "🍜", rating: 4.6, reviewCount: 334,
+    price: "₩₩", tags: ["탄탄면", "마라", "홍대"],
+    hours: "11:00 – 22:00", holiday: "수요일",
+    desc: "홍대 젊은이들 사이에서 입소문 난 정통 쓰촨식 탄탄면 전문점. 직접 제조한 면발과 고소한 참깨 베이스 소스에 마라의 얼얼함이 중독성 있습니다.",
+    reviews: [
+      { user: "👩 한소희", date: "2025-12-02", score: 5, text: "탄탄면 맛이 현지 그대로예요! 마라맛 조절도 되고." },
+      { user: "🧑 변우석", date: "2025-11-15", score: 4, text: "줄 서는 맛집인데 기다릴 가치 충분히 있어요." }
+    ],
+    isNew: true, isHot: true
+  },
+  {
+    id: 8, name: "종로 피맛골 떡볶이",
+    category: "분식", region: "서울", district: "종로구",
+    address: "서울 종로구 청진동 123",
+    emoji: "🌶️", rating: 4.3, reviewCount: 612,
+    price: "₩", tags: ["떡볶이", "순대", "종로"],
+    hours: "09:00 – 21:00", holiday: "일요일",
+    desc: "종로 피맛골의 50년 역사를 가진 분식집. 매콤달콤한 진한 국물 떡볶이와 쫄깃한 순대 조합은 변하지 않는 서울 길거리 음식의 정수입니다.",
+    reviews: [
+      { user: "🧑 이정재", date: "2025-11-10", score: 4, text: "어릴 때 먹던 그 맛! 향수가 느껴지는 떡볶이." },
+      { user: "👩 전지현", date: "2025-10-05", score: 5, text: "50년 전통이 괜히 있는 게 아니에요. 국물이 최고." }
+    ],
+    isNew: false, isHot: false
+  },
+  {
+    id: 9, name: "삼청동 북촌 한정식",
+    category: "한식", region: "서울", district: "종로구",
+    address: "서울 종로구 삼청로 122",
+    emoji: "🎎", rating: 4.7, reviewCount: 148,
+    price: "₩₩₩₩", tags: ["한정식", "한옥", "접대"],
+    hours: "12:00 – 21:00", holiday: "월요일",
+    desc: "한옥을 개조한 고풍스러운 공간에서 즐기는 코스 한정식. 제철 재료로 정성껏 만든 20가지 이상의 반찬과 정갈한 한식 메인이 코스로 제공됩니다.",
+    reviews: [
+      { user: "👩 김고은", date: "2025-12-01", score: 5, text: "한옥 분위기에서 먹는 한정식, 진짜 특별한 경험이었어요." },
+      { user: "🧑 공유", date: "2025-11-20", score: 5, text: "접대 자리로 완벽. 서비스도 세심하고 음식도 훌륭." }
+    ],
+    isNew: false, isHot: true
+  },
+  {
+    id: 10, name: "연남동 브런치 카페",
+    category: "카페", region: "서울", district: "마포구",
+    address: "서울 마포구 연남동 228-13",
+    emoji: "☕", rating: 4.4, reviewCount: 297,
+    price: "₩₩", tags: ["브런치", "스페셜티", "연남"],
+    hours: "09:00 – 20:00", holiday: "없음",
+    desc: "연남동 경의선숲길 옆 아늑한 브런치 카페. 직접 로스팅한 스페셜티 커피와 신선한 재료로 만든 에그 베네딕트, 아보카도 토스트가 시그니처 메뉴입니다.",
+    reviews: [
+      { user: "👩 수지", date: "2025-12-05", score: 4, text: "연남동 최고의 커피! 에그 베네딕트도 진짜 맛있어요." },
+      { user: "🧑 기성용", date: "2025-11-22", score: 5, text: "분위기 너무 좋고 커피 퀄리티가 스페셜티 답네요." }
+    ],
+    isNew: false, isHot: false
+  },
+  {
+    id: 11, name: "이태원 고기집 참숯화로",
+    category: "고기", region: "서울", district: "용산구",
+    address: "서울 용산구 이태원동 52-7",
+    emoji: "🔥", rating: 4.8, reviewCount: 389,
+    price: "₩₩₩", tags: ["한우", "참숯", "이태원"],
+    hours: "16:00 – 24:00", holiday: "없음",
+    desc: "이태원에서 참숯으로 직접 구워주는 한우 구이 전문점. 1++ 등급 한우를 두툼하게 썰어 숙련된 직원이 최적의 상태로 구워줍니다. 함께 나오는 된장찌개와 밑반찬도 수준급.",
+    reviews: [
+      { user: "🧑 손흥민", date: "2025-12-03", score: 5, text: "참숯 향이 배인 한우... 정말 환상이에요. 최고의 고기집." },
+      { user: "👩 강소라", date: "2025-11-17", score: 5, text: "직원분이 직접 구워주셔서 너무 편하고 맛도 완벽했어요." }
+    ],
+    isNew: false, isHot: true
+  },
+  {
+    id: 12, name: "노량진 수산시장 회집",
+    category: "해산물", region: "서울", district: "동작구",
+    address: "서울 동작구 노량진동 13-8",
+    emoji: "🦑", rating: 4.5, reviewCount: 521,
+    price: "₩₩", tags: ["회", "수산물", "노량진"],
+    hours: "06:00 – 23:00", holiday: "없음",
+    desc: "노량진 수산시장에서 직접 운영하는 회 전문점. 새벽 경매로 들어온 신선한 제철 생선을 당일 손질해 저렴한 가격에 제공합니다. 활어회의 신선함이 남다릅니다.",
+    reviews: [
+      { user: "👩 박민영", date: "2025-11-30", score: 5, text: "신선도가 남달라요! 활어회 가격 대비 퀄리티 최고." },
+      { user: "🧑 오정세", date: "2025-11-05", score: 4, text: "새벽에 경매 온 거라 그런지 회 맛이 진짜 달라요." }
+    ],
+    isNew: false, isHot: false
+  },
+  {
+    id: 13, name: "수원 왕갈비 원조집",
+    category: "고기", region: "경기", district: "수원시",
+    address: "경기 수원시 팔달구 팔달로 120",
+    emoji: "🥩", rating: 4.9, reviewCount: 876,
+    price: "₩₩₩", tags: ["왕갈비", "수원", "전통"],
+    hours: "11:00 – 22:00", holiday: "월요일",
+    desc: "수원 왕갈비의 원조. 화성 행궁 근처 60년 된 터줏대감 식당. 큼직하게 잘라낸 한 덩이 갈비를 달콤짭짤한 양념에 재워 두꺼운 돌판에 구워줍니다. 수원 여행의 필수 코스.",
+    reviews: [
+      { user: "🧑 차태현", date: "2025-12-07", score: 5, text: "수원 왕갈비는 여기가 원탑! 60년 전통 맛이 다릅니다." },
+      { user: "👩 이하늬", date: "2025-11-24", score: 5, text: "갈비 사이즈에 깜짝 놀랐어요. 맛은 당연히 최고!" }
+    ],
+    isNew: false, isHot: true
+  },
+  {
+    id: 14, name: "판교 테크노밸리 라멘",
+    category: "일식", region: "경기", district: "성남시",
+    address: "경기 성남시 분당구 대왕판교로 660",
+    emoji: "🍥", rating: 4.6, reviewCount: 203,
+    price: "₩₩", tags: ["라멘", "판교", "점심"],
+    hours: "11:00 – 21:00", holiday: "토·일요일",
+    desc: "판교 IT기업 직장인들의 점심 성지. 돈코츠와 쇼유를 블렌딩한 독자적인 육수가 특징. 차슈는 18시간 이상 저온 조리해 입에서 살살 녹습니다.",
+    reviews: [
+      { user: "🧑 개발자K", date: "2025-12-04", score: 5, text: "판교 점심 중 단연 최고! 육수가 진하고 차슈가 환상." },
+      { user: "👩 기획자M", date: "2025-11-20", score: 4, text: "직장인 점심으로 완벽해요. 가성비도 좋고." }
+    ],
+    isNew: true, isHot: false
+  },
+  {
+    id: 15, name: "일산 호수공원 막국수",
+    category: "한식", region: "경기", district: "고양시",
+    address: "경기 고양시 일산동구 장항동 851",
+    emoji: "🍛", rating: 4.5, reviewCount: 341,
+    price: "₩", tags: ["막국수", "일산", "호수공원"],
+    hours: "10:00 – 20:00", holiday: "화요일",
+    desc: "일산 호수공원 산책 후 들르기 좋은 막국수 전문점. 메밀 함량 80%의 면발이 쫄깃하고 구수합니다. 수육 세트와 함께 먹으면 조합이 완벽합니다.",
+    reviews: [
+      { user: "👩 이영애", date: "2025-10-20", score: 5, text: "산책 후 막국수 한 그릇! 면발 메밀 향이 진하고 맛있어요." },
+      { user: "🧑 정성화", date: "2025-09-28", score: 4, text: "수육이랑 같이 먹으면 정말 맛있어요. 양도 넉넉합니다." }
+    ],
+    isNew: false, isHot: false
+  },
+  {
+    id: 16, name: "분당 정자동 스테이크 하우스",
+    category: "양식", region: "경기", district: "성남시",
+    address: "경기 성남시 분당구 정자동 150",
+    emoji: "🥗", rating: 4.7, reviewCount: 167,
+    price: "₩₩₩₩", tags: ["스테이크", "분당", "특별한날"],
+    hours: "12:00 – 22:00", holiday: "월요일",
+    desc: "분당 정자동의 하이엔드 스테이크 레스토랑. 호주산 와규와 미국산 프라임 비프를 드라이에이징해 최상의 상태로 제공. 와인 셀렉션도 풍부합니다.",
+    reviews: [
+      { user: "🧑 현빈", date: "2025-11-29", score: 5, text: "드라이에이징 스테이크가 이렇게 맛있을 줄이야. 감동." },
+      { user: "👩 손예진", date: "2025-11-10", score: 5, text: "기념일에 왔는데 완벽한 경험이었어요." }
+    ],
+    isNew: false, isHot: false
+  },
+  {
+    id: 17, name: "광교 카페 테라로사",
+    category: "카페", region: "경기", district: "수원시",
+    address: "경기 수원시 영통구 광교호수로 145",
+    emoji: "🫘", rating: 4.6, reviewCount: 489,
+    price: "₩₩", tags: ["스페셜티커피", "광교", "호수뷰"],
+    hours: "08:00 – 22:00", holiday: "없음",
+    desc: "광교호수공원 바로 옆에 위치한 대형 스페셜티 커피 전문점. 탁 트인 호수 전망과 함께 즐기는 핸드드립 커피가 일품입니다. 베이커리도 수준급.",
+    reviews: [
+      { user: "👩 박보영", date: "2025-12-06", score: 5, text: "호수 보며 마시는 커피... 분위기가 너무 좋아요!" },
+      { user: "🧑 최우식", date: "2025-11-20", score: 4, text: "커피 퀄리티 탁월하고 공간이 넓어서 여유롭게 쉬기 좋아요." }
+    ],
+    isNew: false, isHot: true
+  },
+  {
+    id: 18, name: "강남 도산공원 스시 오마카세",
+    category: "일식", region: "서울", district: "강남구",
+    address: "서울 강남구 도산대로 241",
+    emoji: "🐟", rating: 4.8, reviewCount: 76,
+    price: "₩₩₩₩", tags: ["오마카세", "강남", "도산공원"],
+    hours: "12:00 – 22:00", holiday: "일요일",
+    desc: "도산공원 인근 모던 재패니즈 다이닝. 국내 최고 수준의 소믈리에와 스시 장인이 협력해 만들어내는 오마카세 코스. 일본술(사케) 페어링이 특히 유명합니다.",
+    reviews: [
+      { user: "👩 블로거foodie", date: "2025-11-14", score: 5, text: "사케 페어링이 정말 놀라웠어요. 음식과의 조화가 완벽." },
+      { user: "🧑 미식가K", date: "2025-10-18", score: 5, text: "서울 오마카세 중 다섯 손가락 안에 드는 퀄리티." }
+    ],
+    isNew: true, isHot: true
+  },
+  {
+    id: 19, name: "마포 망원시장 어묵탕",
+    category: "분식", region: "서울", district: "마포구",
+    address: "서울 마포구 망원동 424",
+    emoji: "🍢", rating: 4.2, reviewCount: 437,
+    price: "₩", tags: ["어묵", "망원", "시장"],
+    hours: "10:00 – 20:00", holiday: "화요일",
+    desc: "망원시장 내 30년 전통 어묵 노점. 진한 멸치 다시마 육수에 각종 어묵이 조화롭게 어우러집니다. 추운 겨울 따뜻하게 속을 채워주는 서울 시장 음식의 정수.",
+    reviews: [
+      { user: "👩 서현진", date: "2025-11-28", score: 4, text: "시장 어묵은 역시 달라요. 국물이 진하고 시원해!" },
+      { user: "🧑 오달수", date: "2025-10-30", score: 4, text: "겨울에 손 녹이면서 먹는 어묵 국물 한 컵... 행복이죠." }
+    ],
+    isNew: false, isHot: false
+  },
+  {
+    id: 20, name: "고양 킨텍스 짬뽕",
+    category: "중식", region: "경기", district: "고양시",
+    address: "경기 고양시 일산서구 킨텍스로 240",
+    emoji: "🍛", rating: 4.4, reviewCount: 289,
+    price: "₩₩", tags: ["짬뽕", "고양", "킨텍스"],
+    hours: "10:30 – 21:30", holiday: "없음",
+    desc: "킨텍스 전시장 방문객들의 점심 명소. 해물을 아낌없이 넣어 시원하고 칼칼한 짬뽕이 특징. 기름 끼 없이 개운한 국물이 해물의 풍미를 극대화합니다.",
+    reviews: [
+      { user: "🧑 황정민", date: "2025-12-01", score: 4, text: "짬뽕 해물 양이 엄청나요. 국물도 칼칼하고 시원해요!" },
+      { user: "👩 나영희", date: "2025-11-12", score: 5, text: "고양에서 이런 짬뽕 만날 줄 몰랐어요. 완전 대박." }
+    ],
+    isNew: false, isHot: false
+  },
+  {
+    id: 21, name: "신촌 대학로 돈까스",
+    category: "분식", region: "서울", district: "마포구",
+    address: "서울 마포구 신촌로 85",
+    emoji: "🍱", rating: 4.3, reviewCount: 556,
+    price: "₩", tags: ["돈까스", "신촌", "가성비"],
+    hours: "11:00 – 22:00", holiday: "없음",
+    desc: "연세대·이화여대 학생들의 밥친구. 바삭한 빵가루 튀김에 달콤한 데미글라스 소스가 짝꿍. 30년째 변하지 않는 500g 왕돈까스가 시그니처. 놀라운 가성비.",
+    reviews: [
+      { user: "🧑 대학생J", date: "2025-11-25", score: 4, text: "학생 때 자주 왔던 곳! 졸업해도 계속 오게 되는 맛이에요." },
+      { user: "👩 직장인P", date: "2025-10-14", score: 4, text: "이 가격에 왕돈까스 한 판이라니. 최고의 가성비!" }
+    ],
+    isNew: false, isHot: false
+  },
+  {
+    id: 22, name: "용산 한강진 버거",
+    category: "양식", region: "서울", district: "용산구",
+    address: "서울 용산구 한강진역 2번출구",
+    emoji: "🍔", rating: 4.5, reviewCount: 322,
+    price: "₩₩", tags: ["수제버거", "용산", "한강뷰"],
+    hours: "11:00 – 22:00", holiday: "없음",
+    desc: "한강진역 근처, 한강 뷰를 보며 먹는 수제버거 맛집. 매일 배달된 최고 등급 패티를 직화로 구워 두툼하게 쌓아올린 시그니처 버거가 인기.",
+    reviews: [
+      { user: "🧑 BTS팬", date: "2025-12-09", score: 5, text: "한강 보이는 자리에서 먹는 버거 진짜 맛있어요!" },
+      { user: "👩 여행자K", date: "2025-11-16", score: 4, text: "패티 두께 실화예요. 수제버거 중 최상급." }
+    ],
+    isNew: true, isHot: false
+  },
+  {
+    id: 23, name: "부천 소풍 갈비",
+    category: "고기", region: "경기", district: "부천시",
+    address: "경기 부천시 원미구 상동 535",
+    emoji: "🍖", rating: 4.6, reviewCount: 413,
+    price: "₩₩", tags: ["갈비", "부천", "가족식사"],
+    hours: "11:30 – 22:00", holiday: "없음",
+    desc: "부천 지역 가족 외식의 대표 식당. 직접 숯불에 구워주는 돼지갈비와 소갈비가 주력. 양이 푸짐하고 밑반찬이 정성스러워 온 가족이 만족하는 곳입니다.",
+    reviews: [
+      { user: "👩 주부L", date: "2025-12-05", score: 5, text: "가족이랑 오기 너무 좋아요. 갈비도 맛있고 서비스도 친절!" },
+      { user: "🧑 아버지B", date: "2025-11-08", score: 4, text: "숯불 갈비 제대로 먹을 수 있는 곳. 양도 많고 맛도 좋아요." }
+    ],
+    isNew: false, isHot: false
+  },
+  {
+    id: 24, name: "의정부 부대찌개 거리",
+    category: "한식", region: "경기", district: "의정부시",
+    address: "경기 의정부시 의정부동 부대찌개 거리",
+    emoji: "🥫", rating: 4.7, reviewCount: 698,
+    price: "₩₩", tags: ["부대찌개", "의정부", "원조"],
+    hours: "10:00 – 22:00", holiday: "없음",
+    desc: "부대찌개의 고향, 의정부. 1970년대부터 이어진 거리에서 진짜 부대찌개를 맛볼 수 있습니다. 소시지, 베이크드 빈, 라면 사리가 가득한 푸짐한 냄비. 의정부 방문 필수 코스.",
+    reviews: [
+      { user: "🧑 부대찌개마니아", date: "2025-12-10", score: 5, text: "원조는 역시 달라요. 의정부 부대찌개 거리 꼭 와보세요!" },
+      { user: "👩 서울에서온V", date: "2025-11-22", score: 5, text: "소시지 퀄리티가 남달라요. 국물도 진하고 맛있어요." }
+    ],
+    isNew: false, isHot: true
+  }
+];
+
+/* ── State ── */
+let state = {
+  region: "전체",
+  category: "전체",
+  sort: "rating",
+  search: ""
+};
+
+/* ── Helpers ── */
+function renderStars(score, size = "small") {
+  const full = Math.floor(score);
+  const half = score - full >= 0.3 && score - full < 0.8 ? 1 : 0;
+  const empty = 5 - full - half;
+  let html = '<div class="rating__stars">';
+  for (let i = 0; i < full; i++)  html += `<span class="star star--full">★</span>`;
+  for (let i = 0; i < half; i++)  html += `<span class="star star--half">★</span>`;
+  for (let i = 0; i < empty; i++) html += `<span class="star star--empty">★</span>`;
+  html += '</div>';
+  return html;
+}
+
+function getFiltered() {
+  return RESTAURANTS.filter(r => {
+    const regionMatch = state.region === "전체"
+      || r.region === state.region
+      || r.district === state.region
+      || (state.region === "서울" && r.region === "서울")
+      || (state.region === "경기" && r.region === "경기");
+    const catMatch = state.category === "전체" || r.category === state.category;
+    const q = state.search.toLowerCase();
+    const searchMatch = !q
+      || r.name.toLowerCase().includes(q)
+      || r.district.toLowerCase().includes(q)
+      || r.category.toLowerCase().includes(q)
+      || r.tags.some(t => t.toLowerCase().includes(q));
+    return regionMatch && catMatch && searchMatch;
+  }).sort((a, b) => {
+    if (state.sort === "rating")  return b.rating - a.rating;
+    if (state.sort === "reviews") return b.reviewCount - a.reviewCount;
+    if (state.sort === "name")    return a.name.localeCompare(b.name, "ko");
+    return 0;
+  });
+}
+
+function renderCard(r) {
+  const badgesHtml = [
+    r.isHot ? '<span class="badge badge--brand">🔥 인기</span>' : '',
+    r.isNew ? '<span class="badge badge--new">✨ 신규</span>' : ''
+  ].join('');
+
+  const tagsHtml = r.tags.map(t => `<span class="tag">${t}</span>`).join('');
+
+  return `
+    <article class="card" onclick="openModal(${r.id})">
+      <div class="card__thumb">
+        <img class="card__thumb-img" src="${IMAGE_MAP[r.id]}" alt="${r.name}" loading="lazy"
+          onload="this.classList.add('loaded')"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <div class="card__thumb-fallback">${r.emoji}</div>
+        <div class="card__badge-area">${badgesHtml}</div>
+        <button class="card__bookmark" onclick="event.stopPropagation(); toggleBookmark(this)" title="북마크">🤍</button>
+      </div>
+      <div class="card__body">
+        <p class="card__category">${r.category} · ${r.district}</p>
+        <h3 class="card__name">${r.name}</h3>
+        <p class="card__location">📍 ${r.address}</p>
+        <div class="card__rating-row">
+          <div class="rating">
+            ${renderStars(r.rating)}
+            <span class="rating__score">${r.rating}</span>
+            <span class="rating__count">(${r.reviewCount.toLocaleString()})</span>
+          </div>
+          <span class="card__price-range">${r.price}</span>
+        </div>
+        <div class="card__tags">${tagsHtml}</div>
+        <div class="card__actions">
+          <button class="btn btn--brand-solid btn--small" style="flex:1" onclick="event.stopPropagation(); openModal(${r.id})">자세히 보기</button>
+          <button class="btn btn--neutral-weak btn--small" onclick="event.stopPropagation()">길 찾기</button>
+        </div>
+      </div>
+    </article>`;
+}
+
+function renderGrid() {
+  const list = getFiltered();
+  const grid = document.getElementById("restaurantGrid");
+  const count = document.getElementById("resultCount");
+  document.getElementById("totalCount").textContent = RESTAURANTS.length;
+
+  if (list.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state__icon">🍽️</div>
+        <h3 class="empty-state__title">찾는 맛집이 없어요</h3>
+        <p class="empty-state__desc">다른 지역이나 카테고리로 검색해보세요</p>
+        <button class="btn btn--brand-solid btn--medium" onclick="resetFilters()">전체 보기</button>
+      </div>`;
+    count.innerHTML = `총 <strong>0개</strong>의 식당`;
+    return;
+  }
+
+  count.innerHTML = `총 <strong>${list.length}개</strong>의 식당`;
+  grid.innerHTML = list.map(renderCard).join('');
+}
+
+/* ── Filters ── */
+document.getElementById("regionChips").addEventListener("click", e => {
+  const btn = e.target.closest("[data-region]");
+  if (!btn) return;
+  document.querySelectorAll("[data-region]").forEach(b => b.classList.remove("chip--active"));
+  btn.classList.add("chip--active");
+  state.region = btn.dataset.region;
+  renderGrid();
+});
+
+document.getElementById("categoryChips").addEventListener("click", e => {
+  const btn = e.target.closest("[data-cat]");
+  if (!btn) return;
+  document.querySelectorAll("[data-cat]").forEach(b => b.classList.remove("chip--active"));
+  btn.classList.add("chip--active");
+  state.category = btn.dataset.cat;
+  renderGrid();
+});
+
+document.querySelectorAll(".sort-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".sort-btn").forEach(b => {
+      b.classList.remove("btn--neutral-solid");
+      b.classList.add("btn--neutral-outline");
+    });
+    btn.classList.remove("btn--neutral-outline");
+    btn.classList.add("btn--neutral-solid");
+    state.sort = btn.dataset.sort;
+    renderGrid();
+  });
+});
+
+let searchTimeout;
+document.getElementById("searchInput").addEventListener("input", e => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    state.search = e.target.value;
+    renderGrid();
+  }, 250);
+});
+
+/* ── Random Btn ── */
+document.getElementById("randomBtn").addEventListener("click", () => {
+  const list = getFiltered();
+  if (!list.length) return;
+  const r = list[Math.floor(Math.random() * list.length)];
+  openModal(r.id);
+});
+
+function resetFilters() {
+  state = { region: "전체", category: "전체", sort: "rating", search: "" };
+  document.querySelectorAll("[data-region]").forEach(b => b.classList.toggle("chip--active", b.dataset.region === "전체"));
+  document.querySelectorAll("[data-cat]").forEach(b => b.classList.toggle("chip--active", b.dataset.cat === "전체"));
+  document.getElementById("searchInput").value = "";
+  renderGrid();
+}
+
+/* ── Bookmark ── */
+function toggleBookmark(btn) {
+  btn.textContent = btn.textContent === "🤍" ? "❤️" : "🤍";
+}
+
+/* ── Modal ── */
+function openModal(id) {
+  const r = RESTAURANTS.find(x => x.id === id);
+  if (!r) return;
+
+  const reviewsHtml = r.reviews.map(rv => `
+    <div class="review-item">
+      <div class="review-item__header">
+        <div class="review-item__avatar">${rv.user.split(' ')[0]}</div>
+        <span class="review-item__name">${rv.user}</span>
+        <span class="review-item__date">${rv.date}</span>
+      </div>
+      <div class="review-item__stars">${renderStars(rv.score)}</div>
+      <p class="review-item__text">${rv.text}</p>
+    </div>`).join('');
+
+  document.getElementById("modalContent").innerHTML = `
+    <div class="modal__hero">
+      <img class="modal__hero-img" src="${IMAGE_MAP[r.id]}" alt="${r.name}"
+        onerror="this.style.display='none';this.parentElement.innerHTML+='<span style=\\'font-size:72px\\'>${r.emoji}</span>'" />
+      <button class="modal__close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal__body">
+      <p class="modal__category">${r.category} · ${r.district}</p>
+      <h2 class="modal__name">${r.name}</h2>
+      <p class="modal__location">📍 ${r.address}</p>
+
+      <div class="modal__rating-block">
+        <div class="modal__rating-score">${r.rating}</div>
+        <div class="modal__rating-detail">
+          <div class="modal__rating-stars">${renderStars(r.rating)}</div>
+          <div class="modal__rating-count">리뷰 ${r.reviewCount.toLocaleString()}개 기준</div>
+        </div>
+        <button class="btn btn--brand-outline btn--small">리뷰 쓰기</button>
+      </div>
+
+      <div class="modal__info-grid">
+        <div class="modal__info-item">
+          <p class="modal__info-key">가격대</p>
+          <p class="modal__info-val">${r.price}</p>
+        </div>
+        <div class="modal__info-item">
+          <p class="modal__info-key">카테고리</p>
+          <p class="modal__info-val">${r.category}</p>
+        </div>
+        <div class="modal__info-item">
+          <p class="modal__info-key">영업시간</p>
+          <p class="modal__info-val">${r.hours}</p>
+        </div>
+        <div class="modal__info-item">
+          <p class="modal__info-key">휴무</p>
+          <p class="modal__info-val">${r.holiday}</p>
+        </div>
+      </div>
+
+      <p class="modal__desc">${r.desc}</p>
+
+      <h3 class="modal__review-title">최근 리뷰 💬</h3>
+      ${reviewsHtml}
+
+      <div class="modal__cta">
+        <button class="btn btn--brand-solid btn--large btn--fill">📍 길 찾기</button>
+        <button class="btn btn--neutral-weak btn--large" onclick="closeModal()">닫기</button>
+      </div>
+    </div>`;
+
+  document.getElementById("modalOverlay").classList.add("modal-overlay--open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  document.getElementById("modalOverlay").classList.remove("modal-overlay--open");
+  document.body.style.overflow = "";
+}
+
+document.getElementById("modalOverlay").addEventListener("click", e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+/* ── Init ── */
+renderGrid();
+</script>
+</body>
+</html>
