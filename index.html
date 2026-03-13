@@ -1481,7 +1481,9 @@ function openModal(id) {
       ${reviewsHtml}
 
       <div class="modal__cta">
-        <button class="btn btn--brand-solid btn--large btn--fill">📍 길 찾기</button>
+        <a class="btn btn--brand-solid btn--large btn--fill"
+           href="https://map.naver.com/v5/search/${encodeURIComponent(r.address)}"
+           target="_blank" rel="noopener noreferrer">📍 길 찾기</a>
         <button class="btn btn--neutral-weak btn--large" onclick="closeModal()">닫기</button>
       </div>
     </div>`;
