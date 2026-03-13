@@ -751,6 +751,77 @@
       .modal__info-grid { grid-template-columns: 1fr; }
     }
 
+    /* ── Review Modal ── */
+    .review-modal-overlay {
+      position: fixed; inset: 0; z-index: 1100;
+      background: rgba(0,0,0,0.55);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .review-modal-overlay--open { opacity: 1; pointer-events: all; }
+    .review-modal {
+      background: var(--color-static-white);
+      border-radius: var(--radius-card);
+      width: 100%; max-width: 480px;
+      padding: 28px 24px 24px;
+      transform: translateY(16px);
+      transition: transform 0.25s ease;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .review-modal-overlay--open .review-modal { transform: translateY(0); }
+    .review-modal__header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .review-modal__title { font-size: 18px; font-weight: var(--font-weight-bold); }
+    .review-modal__close {
+      width: 32px; height: 32px; border-radius: 50%; border: none;
+      background: var(--color-bg-neutral-weak); cursor: pointer; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .review-modal__field { margin-bottom: 16px; }
+    .review-modal__label {
+      display: block; font-size: 13px; font-weight: var(--font-weight-semibold);
+      color: var(--color-fg-neutral); margin-bottom: 6px;
+    }
+    .review-modal__select,
+    .review-modal__input,
+    .review-modal__textarea {
+      width: 100%; padding: 10px 12px; border-radius: var(--radius-r2);
+      border: 1.5px solid var(--color-stroke-neutral-muted);
+      font-size: 14px; font-family: inherit; color: var(--color-fg-neutral);
+      background: var(--color-static-white);
+      transition: border-color 0.15s;
+      box-sizing: border-box;
+    }
+    .review-modal__select:focus,
+    .review-modal__input:focus,
+    .review-modal__textarea:focus {
+      outline: none; border-color: var(--color-bg-brand-solid);
+    }
+    .review-modal__textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+    /* 별점 선택 */
+    .star-picker { display: flex; gap: 6px; }
+    .star-picker__star {
+      font-size: 28px; cursor: pointer; transition: transform 0.12s;
+      color: var(--color-gray-200); user-select: none;
+    }
+    .star-picker__star:hover,
+    .star-picker__star.active { color: #FACC15; transform: scale(1.15); }
+    .review-modal__actions { display: flex; gap: 8px; margin-top: 20px; }
+    /* 토스트 */
+    .toast {
+      position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--color-bg-neutral-inverted); color: var(--color-fg-neutral-inverted);
+      padding: 12px 24px; border-radius: var(--radius-full);
+      font-size: 14px; font-weight: var(--font-weight-semibold);
+      opacity: 0; transition: all 0.3s ease; pointer-events: none; z-index: 2000;
+      white-space: nowrap;
+    }
+    .toast--show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
     /* ── Animations ── */
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(12px); }
@@ -868,6 +939,50 @@
     <!-- JS로 채워짐 -->
   </div>
 </div>
+
+<!-- ── 리뷰 쓰기 모달 ── -->
+<div class="review-modal-overlay" id="reviewModalOverlay">
+  <div class="review-modal">
+    <div class="review-modal__header">
+      <h2 class="review-modal__title">📝 리뷰 쓰기</h2>
+      <button class="review-modal__close" onclick="closeReviewModal()">✕</button>
+    </div>
+
+    <div class="review-modal__field">
+      <label class="review-modal__label">식당 선택 *</label>
+      <select class="review-modal__select" id="reviewRestaurant"></select>
+    </div>
+
+    <div class="review-modal__field">
+      <label class="review-modal__label">별점 *</label>
+      <div class="star-picker" id="starPicker">
+        <span class="star-picker__star" data-v="1">★</span>
+        <span class="star-picker__star" data-v="2">★</span>
+        <span class="star-picker__star" data-v="3">★</span>
+        <span class="star-picker__star" data-v="4">★</span>
+        <span class="star-picker__star" data-v="5">★</span>
+      </div>
+    </div>
+
+    <div class="review-modal__field">
+      <label class="review-modal__label">닉네임 *</label>
+      <input class="review-modal__input" id="reviewNickname" type="text" placeholder="예) 맛집탐험가" maxlength="20" />
+    </div>
+
+    <div class="review-modal__field">
+      <label class="review-modal__label">리뷰 내용 *</label>
+      <textarea class="review-modal__textarea" id="reviewText" placeholder="방문 후기를 자유롭게 남겨주세요 😊" maxlength="300"></textarea>
+    </div>
+
+    <div class="review-modal__actions">
+      <button class="btn btn--brand-solid btn--large btn--fill" onclick="submitReview()">리뷰 등록</button>
+      <button class="btn btn--neutral-weak btn--large" onclick="closeReviewModal()">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 토스트 ── -->
+<div class="toast" id="toast"></div>
 
 <!-- ── Footer ── -->
 <footer class="footer">
@@ -1482,7 +1597,8 @@ function openModal(id) {
 
       <div class="modal__cta">
         <button class="btn btn--brand-solid btn--large btn--fill" onclick="window.open('https://map.naver.com/v5/search/${encodeURIComponent(r.address)}', '_blank')">📍 길 찾기</button>
-        <button class="btn btn--neutral-weak btn--large" onclick="closeModal()">닫기</button>
+        <button class="btn btn--neutral-weak btn--large" onclick="closeModal(); openReviewModal(${r.id})">✏️ 리뷰 쓰기</button>
+        <button class="btn btn--neutral-outline btn--large" onclick="closeModal()">닫기</button>
       </div>
     </div>`;
 
@@ -1498,7 +1614,107 @@ function closeModal() {
 document.getElementById("modalOverlay").addEventListener("click", e => {
   if (e.target === e.currentTarget) closeModal();
 });
-document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") { closeModal(); closeReviewModal(); }
+});
+
+/* ── 리뷰 쓰기 모달 ── */
+let selectedStar = 0;
+
+function openReviewModal(restaurantId = null) {
+  // 식당 목록 채우기
+  const sel = document.getElementById("reviewRestaurant");
+  sel.innerHTML = RESTAURANTS.map(r =>
+    `<option value="${r.id}">${r.name}</option>`
+  ).join('');
+  if (restaurantId) sel.value = restaurantId;
+
+  // 별점 초기화
+  selectedStar = 0;
+  document.querySelectorAll('.star-picker__star').forEach(s => s.classList.remove('active'));
+
+  // 입력 초기화
+  document.getElementById("reviewNickname").value = '';
+  document.getElementById("reviewText").value = '';
+
+  document.getElementById("reviewModalOverlay").classList.add("review-modal-overlay--open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeReviewModal() {
+  document.getElementById("reviewModalOverlay").classList.remove("review-modal-overlay--open");
+  document.body.style.overflow = "";
+}
+
+function submitReview() {
+  const restaurantId = parseInt(document.getElementById("reviewRestaurant").value);
+  const nickname = document.getElementById("reviewNickname").value.trim();
+  const text = document.getElementById("reviewText").value.trim();
+
+  if (!selectedStar) return showToast("⭐ 별점을 선택해주세요!");
+  if (!nickname)     return showToast("✏️ 닉네임을 입력해주세요!");
+  if (!text)         return showToast("💬 리뷰 내용을 입력해주세요!");
+
+  const restaurant = RESTAURANTS.find(r => r.id === restaurantId);
+  const today = new Date().toISOString().slice(0, 10);
+
+  restaurant.reviews.unshift({
+    user: `🧑 ${nickname}`,
+    date: today,
+    score: selectedStar,
+    text
+  });
+
+  // 평점 평균 업데이트
+  const total = restaurant.reviews.reduce((s, r) => s + r.score, 0);
+  restaurant.rating = Math.round((total / restaurant.reviews.length) * 10) / 10;
+  restaurant.reviewCount = restaurant.reviews.length;
+
+  closeReviewModal();
+  renderGrid();
+
+  // 상세 모달이 열려있으면 새로고침
+  const overlay = document.getElementById("modalOverlay");
+  if (overlay.classList.contains("modal-overlay--open")) openModal(restaurantId);
+
+  showToast(`✅ "${restaurant.name}" 리뷰가 등록됐어요!`);
+}
+
+// 별점 클릭
+document.querySelectorAll('.star-picker__star').forEach(star => {
+  star.addEventListener('click', () => {
+    selectedStar = parseInt(star.dataset.v);
+    document.querySelectorAll('.star-picker__star').forEach(s => {
+      s.classList.toggle('active', parseInt(s.dataset.v) <= selectedStar);
+    });
+  });
+  star.addEventListener('mouseenter', () => {
+    const v = parseInt(star.dataset.v);
+    document.querySelectorAll('.star-picker__star').forEach(s => {
+      s.classList.toggle('active', parseInt(s.dataset.v) <= v);
+    });
+  });
+  star.addEventListener('mouseleave', () => {
+    document.querySelectorAll('.star-picker__star').forEach(s => {
+      s.classList.toggle('active', parseInt(s.dataset.v) <= selectedStar);
+    });
+  });
+});
+
+// 오버레이 클릭 닫기
+document.getElementById("reviewModalOverlay").addEventListener("click", e => {
+  if (e.target === e.currentTarget) closeReviewModal();
+});
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("toast--show");
+  setTimeout(() => t.classList.remove("toast--show"), 2800);
+}
+
+/* ── GNB 리뷰 쓰기 버튼 ── */
+document.querySelector('.gnb__actions .btn--brand-solid').addEventListener('click', () => openReviewModal());
 
 /* ── Init ── */
 renderGrid();
